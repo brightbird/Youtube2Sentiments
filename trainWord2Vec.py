@@ -37,17 +37,17 @@ if __name__ == "__main__":
 		Parser = Parser()
 		corpus = Parser.buildSentences()
 		#Train model
-		model = gensim.models.Word2Vec(corpus, min_count=2,workers=4,size=400)
+		model = gensim.models.Word2Vec(corpus, min_count=2,workers=4,size=300)
 		print("Completed training model")
 		#Saving model
-		model.save('models/model'+'_'+identifier)
-		print("Persisted model to /models directory")
+		model.save('Models/model'+'_'+identifier+'_L')
+		print("Persisted model to /Models directory")
 	elif(choice=='2'):
 		print("Building corpus from Google News")
 		model = gensim.models.Word2Vec.load_word2vec_format('data/GoogleNews-vectors-negative300.bin', binary=True)
 		print("Completed training model")
-		model.save('models/model'+'_'+'Google')
-		print("Persisted model to /models directory")
+		model.save('Models/model'+'_'+'Google'+'_L')
+		print("Persisted model to /Models directory")
 	else:
 		print("Error input! Quitting")
 

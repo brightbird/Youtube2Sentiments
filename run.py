@@ -32,6 +32,8 @@ from sklearn.svm import SVC, LinearSVC, NuSVC
 from nltk import bigrams
 from nltk.corpus import stopwords
 from sklearn.metrics import accuracy_score
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.porter import *
 
 
 
@@ -40,6 +42,8 @@ def buildWordVector(model, text, size):
 	vec = np.zeros(size).reshape((1, size))
 	count = 0.
 	for word in text:
+		word = stemmer.stem(word)
+		word = lmtzr.lemmatize(word)
 		try:
 			vec += model[word].reshape((1, size))
 			count += 1.
@@ -100,7 +104,8 @@ def runLibLinearSVM():
 #main script execution
 if __name__ == "__main__":
 	#load model
-	model = gensim.models.Word2Vec.load('Models/model_music')
+	#model = gensim.models.Word2Vec.load('Models/model_music')
+	model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
 	print("Building feature sets...")
 	patternForSymbol = re.compile(r'(\ufeff)', re.U)
 	train_data =[]
@@ -109,14 +114,18 @@ if __name__ == "__main__":
 	test_data=[]
 	train_vectors = []
 	test_vectors = []
-	size = 400 #feature size for word2vec model
-	print("Reading dataset..")
-	#reads in CSV file
+	size = 300 #feature size for word2vec model
+
+
+	#Stemmer and Lemmatizer
+	lmtzr = WordNetLemmatizer()
+	stemmer = PorterStemmer()
 
 	#stores vectors before spliting into training and testing
 	ListOfFeatures = []
 
-	#Get length of CSV file, yes this is crude, there must be a better way!
+	print("Reading dataset..")
+	#reads in CSV file
 	with open('Dataset/dataset.csv','rb') as dataFile:
 		reader = csv.reader(dataFile, delimiter=',')
 		for index,row in enumerate(reader):
@@ -137,6 +146,7 @@ if __name__ == "__main__":
 	totalrows = len(ListOfFeatures)
 	print(len(ListOfFeatures))
 	random.shuffle(ListOfFeatures)
+
 
 	for index,feature in enumerate(ListOfFeatures):
 		vector = feature['word2vec']
