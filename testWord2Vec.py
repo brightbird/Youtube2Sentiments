@@ -26,7 +26,7 @@ if __name__ == "__main__":
 	print("Loading models..")
 	#load models
 	if(choice=="1"):
-		model = gensim.models.Word2Vec.load('models/model_music')
+		model = gensim.models.Word2Vec.load('Models/model_music')
 	elif(choice=="2"):
 		print("Loading Google news vectors...")
 		model = Word2Vec.load_word2vec_format('data/GoogleNews-vectors-negative300.bin', binary=True)
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
 	#Run tests
 	print("Running trials and tests..")
-	testcase = ['music','guitar','taylor','justin','piano','vocal','tone','acoustic','vanessa','beethoven','chopin']
+	testcase = ['chopin','liszt','beethoven']
 	for test in testcase:
 		try:
 			result = model.most_similar(positive=[test], topn=10)

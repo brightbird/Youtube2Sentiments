@@ -2,6 +2,7 @@
 '''
 Python Script for SENNA functionality
 Uses PracNLPTools for Sementic Role Labeling
+NOT USED 
 '''
 
 import csv
@@ -13,7 +14,7 @@ print("Running Shallow Semantic Parser")
 patternForSymbol = re.compile(r'(\ufeff)', re.U)
 comments=[]
 #reads in CSV file
-with open('data/dataset2.csv','rb') as dataFile:
+with open('Dataset/dataset.csv','rb') as dataFile:
     reader = csv.reader(dataFile, delimiter=',')
     for row in reader:
         #row[0] = row[0].decode('utf-8')

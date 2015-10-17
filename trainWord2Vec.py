@@ -6,6 +6,7 @@ Word2Vec Module for NLP Project
 Command Line Script to Train a Word2Vec model
 Uses gensim (python word2vec implementation)
 Supports selecting data source for training word2vec model
+Builds everything from Corpus dir ./Corpus
 '''
 
 # import libraries, modules

@@ -20,7 +20,7 @@ class Parser():
 	#utility method not used
 	def grabCorpusDirectory(self):
 		fileList = []
-		for file in os.listdir("corpus"):
+		for file in os.listdir("Corpus"):
 			if file.endswith(".txt") or file.endswith(".csv"):
 				fileList.append(file)
 		return fileList
