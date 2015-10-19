@@ -1,7 +1,11 @@
+#!/usr/bin/python
+__author__ = 'ytay2'
+
+
 '''
-File IO class
-Parser to parse text and csv files
-Renamed to fileio.py to not confuse gensim
+Builder for File IO
+Parser to parse text and csv files from directories
+Renamed to fileio.py to not confuse gensim (it has it's own parser import)
 @author - tayyi
 '''
 
@@ -13,6 +17,7 @@ import re
 import os
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import *
+from nltk.corpus import stopwords
 
 class Parser():
 
@@ -49,6 +54,7 @@ class Parser():
 						line = line.lower() #converts all to lowercase
 						words = word_tokenize(line)
 						sentence = []
+						words = [w for w in words if not w in stopwords.words("english")]
 						for word in words:
 							word = stemmer.stem(word)
 							word = lmtzr.lemmatize(word)
@@ -71,6 +77,7 @@ class Parser():
 							sentiment = row[1]
 							comment = comment.lower()
 							words = word_tokenize(comment)   
+							words = [w for w in words if not w in stopwords.words("english")]
 							sentence = []
 							for word in words:
 								word = stemmer.stem(word)

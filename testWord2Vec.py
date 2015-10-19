@@ -21,23 +21,26 @@ import re
 #main script execution
 if __name__ == "__main__":
 	print("Choose Corpus to train from:")
-	choice = raw_input("Select your data source:\n 1) Music Model \n 2) Google News Model \n 3) Quit \n")
+	choice = raw_input("Select your data source:\n 1) Music Model \n 2) Google News Model  \n 3) Quit \n")
 
 	print("Loading models..")
 	#load models
 	if(choice=="1"):
-		model = gensim.models.Word2Vec.load('Models/model_music')
+		model = gensim.models.Word2Vec.load('Models/model_music_L')
 	elif(choice=="2"):
 		print("Loading Google news vectors...")
+		#model = gensim.models.Word2Vec.load('Models/model_GoogleNews_300')
 		model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
+	elif(choice=="3"):
+		sys.exit(0)
 	print("Model loaded")
 
 	#Run tests
 	print("Running trials and tests..")
-	testcase = ['chopin','liszt','beethoven','justin','violin','vocal','man','hope','love']
+	testcase = ['chopin','liszt','beethoven','justin','violin','vocal','girl']
 	for test in testcase:
 		try:
-			result = model.most_similar(positive=[test,'piano'],negative=['song'],topn=10)
+			result = model.most_similar(positive=[test],negative=['sad'],topn=10)
 			print("=========RESULT========")
 			print("test case: " + test)
 			for result in result:

@@ -16,6 +16,7 @@ from nltk import word_tokenize
 import nltk
 import csv
 import re
+from gensim.models import Word2Vec
 
 #own modules 
 from corpusbuilder import Parser
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 		Parser = Parser()
 		corpus = Parser.buildSentences()
 		#Train model
-		model = gensim.models.Word2Vec(corpus, min_count=2,workers=4,size=300)
+		model = gensim.models.Word2Vec(corpus, min_count=4,workers=4,size=300)
 		print("Completed training model")
 		#Saving model
 		model.save('Models/model'+'_'+identifier+'_L')
