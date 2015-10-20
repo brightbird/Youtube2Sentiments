@@ -56,8 +56,14 @@ class Parser():
 						sentence = []
 						words = [w for w in words if not w in stopwords.words("english")]
 						for word in words:
-							word = stemmer.stem(word)
-							word = lmtzr.lemmatize(word)
+							if ":/" in word:
+								continue	
+							if "http" in word:
+								continue
+							if "@" in word:
+								continue
+							#word = stemmer.stem(word)
+							#word = lmtzr.lemmatize(word)
 							sentence.append(word)
 						corpus.append(sentence)
 		#Handles annotated documents
