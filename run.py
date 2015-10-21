@@ -38,11 +38,13 @@ from sklearn.externals import joblib
 
 
 #Global Controls
-LEMMATIZE = True
-STEMMING = False 
+LEMMATIZE = False 
+STEMMING = False
 TFIDF = False
-WORD2VEC = True
-BOW = False
+WORD2VEC = False 
+BOW = True
+SAVED = True #True means we do not want to save
+saveVectorizer = False 
 
 "Preprocessing Variables"
 patternForSymbol = re.compile(r'(\ufeff)', re.U) #Regex Emoticon Cleaner
@@ -63,7 +65,8 @@ BOWvectorizer = CountVectorizer(analyzer = "word",   \
                              tokenizer = None,    \
                              preprocessor = None, \
                              stop_words = None,   \
-                             max_features = 5000) 
+                             ngram_range=(1,5), \
+                             max_features = 10000) 
 
 #Making tf-idf vectors
 TFIDFvectorizer = TfidfVectorizer(min_df=5,
@@ -105,11 +108,11 @@ def buildWordVector(model, text, size):
 		entireTextFailed += 1
 		print("Entire text failed")
 
-	#print(vec)
-	#print(len(vec[0]))
 	return vec[0]
 
 def runLinearSVM():
+	global SAVED
+	global saveVectorizer
 	# Perform classification with SVM, kernel=linear
 	print("================Results for SVC(kernel=linear)========")
 	classifier_linear = svm.SVC(kernel='linear')
@@ -126,6 +129,12 @@ def runLinearSVM():
 	print(score)
 	#print("Accuracy:", accuracy_score(test_labels,prediction_linear))
 	print("\n")
+	if(score>=0.85 and SAVED==False):
+		#Save Classifier for future use
+		print("Saving classifier of score:"+str(score))
+		saveClassifier(classifier_linear)
+		SAVED=True #switch, do not want to save multiple classifiers
+		saveVectorizer=True #switch, yes we want to persist vectorizer 
 	return score 
 
 def runRbfSVM():
@@ -162,7 +171,10 @@ def runLibLinearSVM():
 	print("\n")
 
 
-
+def saveClassifier(classifier):
+	filename = 'Classifiers/classifier.pkl'
+	_ = joblib.dump(classifier, filename, compress=9)
+	print("Classifier persisted!")
 
 
 #main script execution
@@ -181,6 +193,7 @@ if __name__ == "__main__":
 	test_data=[]
 	train_vectors = []
 	test_vectors = []
+
 	
 	#stores vectors before spliting into training and testing
 	ListOfFeatures = []
@@ -266,9 +279,16 @@ if __name__ == "__main__":
 		if(BOW):
 			print("----------Bag of words--------------")
 			train_vectors = BOWvectorizer.fit_transform(train_data)
+			#vocab = BOWvectorizer.get_feature_names()
+			#print(vocab)
 			test_vectors = BOWvectorizer.transform(test_data)
 			score = runLinearSVM()
 			BOW_MAX+=score
+			if(saveVectorizer):
+				print("Saving vectorizer..")
+				joblib.dump(BOWvectorizer, 'Classifiers/vectorizer.pkl', compress=9)
+				saveVectorizer = False 
+
 
 		#print("Persisting SVM...")
 		#joblib.dump(classifier_linear, 'svm_linear.pkl') 
