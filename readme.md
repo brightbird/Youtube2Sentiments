@@ -9,6 +9,7 @@ Yes all the corpus, dataset folders are gitignored.
 
 #### Classifier Scripts
 Note: Performance measured on self-obtained and annotated Youtube comment dataset.
+
 1. **naive.py** - Uses NLTK's naive bayes or logistic regression [65%-ish]
 2. **tfidf-svm.py** - Uses Sklearn TF-IDF vectorizer + SVM (linear & RBF kernals) [75%-ish] 
 3. **run.py** - Experiments with different vector representations (bag of words, tfidf, and word2vec) [79-86%-ish]
