@@ -35,16 +35,18 @@ from sklearn.metrics import accuracy_score
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import *
 from sklearn.externals import joblib
+from scipy import sparse
 
 
 #Global Controls
-LEMMATIZE = False 
-STEMMING = False
-TFIDF = False
-WORD2VEC = False 
+LEMMATIZE = True 
+STEMMING = True
+TFIDF = True
+WORD2VEC = True 
 BOW = True
 SAVED = True #True means we do not want to save
 saveVectorizer = False 
+COMBINE = True 
 
 "Preprocessing Variables"
 patternForSymbol = re.compile(r'(\ufeff)', re.U) #Regex Emoticon Cleaner
@@ -52,7 +54,7 @@ lmtzr = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
 #Loop & Testing Controls
-iteration = 10
+iteration = 20
 
 #Word2Vec settings
 size = 300 #feature size for word2vec model
@@ -92,6 +94,7 @@ def buildWordVector(model, text, size):
 		if(LEMMATIZE):
 			word = lmtzr.lemmatize(word)
 		try:
+			#print(model[word].shape)
 			vec += model[word].reshape((1, size))
 			count += 1
 		except KeyError:
@@ -100,14 +103,14 @@ def buildWordVector(model, text, size):
 	if count != 0:
 		vec /= count
 		errorRate = (errorCount/(count+errorCount)) * 100
-		print("Error Percentage:"+str(errorRate))
+		#print("Error Percentage:"+str(errorRate))
 		key_error_rate += errorRate 
 	
 	if count == 0:
 		key_error_rate += 100
 		entireTextFailed += 1
-		print("Entire text failed")
-
+		#print("Entire text failed")
+	print(vec.shape)
 	return vec[0]
 
 def runLinearSVM():
@@ -182,9 +185,8 @@ if __name__ == "__main__":
 	#load model
 	if(WORD2VEC):
 		print("Loading Model..may take some time..please wait!")
-		model = gensim.models.Word2Vec.load('Models/model_music_L')
-		#model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
-		#model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
+		#model = gensim.models.Word2Vec.load('Models/model_music_L')
+		model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
 	print("Building feature sets...")
 	
 	train_data =[]
@@ -237,6 +239,7 @@ if __name__ == "__main__":
 	TFIDF_MAX = 0
 	BOW_MAX = 0
 	WORD2VEC_MAX = 0
+	COMBINE_MAX = 0 
 
 	#Main loop
 	for i in range(0,iteration):
@@ -265,17 +268,48 @@ if __name__ == "__main__":
 					train_vectors.append(vector)
 				train_labels.append(sentiment)
 
+		#Runs word2 vec first because we do not want to corrupt the word2vec vector variable
 		if(WORD2VEC):
 			#Running once for Word2Vec approach (Averaging)
 			print("----------Word2vec Approach------------")
 			score = runLinearSVM()
 			WORD2VEC_MAX+=score
+
+		if(COMBINE):
+			print("----------TF-IDF + Word2Vec---------")
+			temp_train_vectors = TFIDFvectorizer.fit_transform(train_data)
+			temp_test_vectors = TFIDFvectorizer.transform(test_data)
+			print(temp_train_vectors.shape)
+			print(train_vectors[0].shape)
+			combined_train_vector = []
+			combined_test_vector = []
+			for index,vector in enumerate(train_vectors):
+				#print(temp_train_vectors[index,:].shape)
+				#print(vector.shape)
+				temp = sparse.hstack((vector,temp_train_vectors[index,:]))
+				print("tempshape:" + str(temp.shape))
+				temp = temp.toarray()[0]
+				print(temp.shape)
+				combined_train_vector.append(temp)
+			for index,vector in enumerate(test_vectors):
+				temp = sparse.hstack((vector,temp_test_vectors[index,:]))
+				#print(temp)
+				temp = temp.toarray()[0]
+				print(temp.shape)
+				combined_test_vector.append(temp)
+			train_vectors = combined_train_vector
+			test_vectors = combined_test_vector
+			print(train_vectors[0].shape)
+			score = runLinearSVM()
+			COMBINE_MAX+=score
+
 		if(TFIDF):
 			print("----------Tf-idf Approach------------")
 			train_vectors = TFIDFvectorizer.fit_transform(train_data)
 			test_vectors = TFIDFvectorizer.transform(test_data)
 			score = runLinearSVM()
 			TFIDF_MAX+=score
+
 		if(BOW):
 			print("----------Bag of words--------------")
 			train_vectors = BOWvectorizer.fit_transform(train_data)
@@ -302,6 +336,7 @@ print("================Printing Average Results=============")
 if(TFIDF):print("TDIF average score:" + str(TFIDF_MAX / iteration))
 if(BOW):print("Bag of words avg score:" + str(BOW_MAX / iteration))
 if(WORD2VEC):print("Word2Vec Avg score:" + str(WORD2VEC_MAX/iteration))
+if(COMBINE):print("COMBINE Avg score:" + str(COMBINE_MAX/iteration))
 
 
 	#runRbfSVM()

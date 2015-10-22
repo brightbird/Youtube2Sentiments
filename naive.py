@@ -2,30 +2,13 @@
 __author__ = 'espen1,ytay2'
 
 '''
-Classifier Module for NLP Project
+Naive Classifier Module for NLP Project
 Written by Espen Albert, Tay Yi
 
-Usage - run Python classify.py in CLI (does not support argparser yet)
+Usage - run Python naive.py in CLI (does not support argparser yet)
 
-Last Update - 28th September 2015
--Wraps some functionality into functions
--refactored a little
--Adds easy partitioning of test and training data 
--Added other classifiers (logistic regressions, MultinomialNB etc..)
-
-Next steps - SOON :) 
--Add functionality for feature extraction
--Add word2vec integration
--Add n-grams 
-
-General Flow (or at least so I think)
-1) Parse CSV data
-2) Extract features - > featureSet
-3) Wrap them in subset objects (Do we really need this?) // Ommitted for now 
-4) Append subsets to dataset list 
-5) Train them by extracting featuresets again. 
-
-My suggestion is to skip the subset class altogether. 
+Uses Naive Classifier for Sentiment Analysis
+Poor Accuracy - 60-70% :( 
 
 '''
 
@@ -121,7 +104,7 @@ def testClassifier(classifier, testSet):
     print("F-measure: "+ str(fMeasure))
     '''
     
-    print("Number of documents tested" + str(len(testSet)))
+    print("Number of documents tested:" + str(len(testSet)))
     print("Number of errors:" + str(len(errorSentences)))
     '''
     for error in errorSentences:
@@ -170,8 +153,9 @@ def trainAndTest(dataSets,partition):
         classifier = nltk.NaiveBayesClassifier.train(trainingSet)
         testClassifier(classifier, testSet)
         print("Naive Bayes Algo accuracy:" , (nltk.classify.accuracy(classifier, testSet))*100)
-        #classifier.show_most_informative_features(15)
+        classifier.show_most_informative_features(15)
       
+        '''
         LogisticRegression_classifier = SklearnClassifier(LogisticRegression())
         LogisticRegression_classifier.train(trainingSet)
         testingSet = testSet
@@ -180,7 +164,8 @@ def trainAndTest(dataSets,partition):
         MNB_classifier = SklearnClassifier(MultinomialNB())
         MNB_classifier.train(trainingSet)
         print("MNB Algo accuracy:" , (nltk.classify.accuracy(MNB_classifier, testingSet))*100)
-        
+        '''
+
 def writeTrainingDataToFile(dataSets):
     text_file = open("features.txt", "w")
     for dataset in dataSets:
@@ -199,7 +184,7 @@ if __name__ == "__main__":
     comments =[]
 
     #reads in CSV file
-    with open('data/dataset2.csv','rb') as dataFile:
+    with open('Dataset/dataset.csv','rb') as dataFile:
         reader = csv.reader(dataFile, delimiter=',')
         for row in reader:
             row[0] = row[0].decode('utf-8')
