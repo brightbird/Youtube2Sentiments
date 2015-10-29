@@ -4,7 +4,7 @@ __author__ = 'ytay2'
 This is the final script
 Creates features via word2vec and passes it to SVM for classification
 Results are still terribly bad for now.
-Uses word2vec average from music model trained from word2vec
+Uses word2vec average from twitter model trained from word2vec
 '''
 
 # import libraries, modules
