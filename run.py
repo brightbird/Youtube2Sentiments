@@ -39,8 +39,8 @@ from scipy import sparse
 
 
 #Global Controls
-LEMMATIZE = True 
-STEMMING = True
+LEMMATIZE = False
+STEMMING = False
 TFIDF = True
 WORD2VEC = True 
 BOW = True
@@ -53,11 +53,16 @@ patternForSymbol = re.compile(r'(\ufeff)', re.U) #Regex Emoticon Cleaner
 lmtzr = WordNetLemmatizer()
 stemmer = PorterStemmer()
 
+#POS tags Filters
+POSFilter = ["JJ", "JJS", "JJR",'NN','NNS','NNP']
+POSFilters = True
+
+
 #Loop & Testing Controls
-iteration = 20
+iteration = 10
 
 #Word2Vec settings
-size = 300 #feature size for word2vec model
+size = 28 #feature size for word2vec model
 key_error_rate = 0 
 vectorCount = 0 
 entireTextFailed = 0 
@@ -68,7 +73,7 @@ BOWvectorizer = CountVectorizer(analyzer = "word",   \
                              preprocessor = None, \
                              stop_words = None,   \
                              ngram_range=(1,5), \
-                             max_features = 10000) 
+                             max_features = 300) 
 
 #Making tf-idf vectors
 TFIDFvectorizer = TfidfVectorizer(min_df=5,
@@ -110,7 +115,7 @@ def buildWordVector(model, text, size):
 		key_error_rate += 100
 		entireTextFailed += 1
 		#print("Entire text failed")
-	print(vec.shape)
+	#print(vec.shape)
 	return vec[0]
 
 def runLinearSVM():
@@ -140,40 +145,6 @@ def runLinearSVM():
 		saveVectorizer=True #switch, yes we want to persist vectorizer 
 	return score 
 
-def runRbfSVM():
-	#Perform classification with SVM, kernel=rbf
-	classifier_rbf = svm.SVC()
-	t0 = time.time()
-	classifier_rbf.fit(train_vectors, train_labels)
-	t1 = time.time()
-	prediction_rbf = classifier_rbf.predict(test_vectors)
-	t2 = time.time()
-	time_rbf_train = t1-t0
-	time_rbf_predict = t2-t1
-	# Print results in a nice table
-	print("================Results for SVC(kernel)-RBF========")
-	print("Training time: %fs; Prediction time: %fs" % (time_rbf_train, time_rbf_predict))
-	print(classification_report(test_labels, prediction_rbf))
-	print("Accuracy:", accuracy_score(test_labels,prediction_rbf))
-	print("\n")
-
-def runLibLinearSVM():
-	# Perform classification with SVM, kernel=linear
-	classifier_liblinear = svm.LinearSVC()
-	t0 = time.time()
-	classifier_liblinear.fit(train_vectors, train_labels)
-	t1 = time.time()
-	prediction_liblinear = classifier_liblinear.predict(test_vectors)
-	t2 = time.time()
-	time_liblinear_train = t1-t0
-	time_liblinear_predict = t2-t1
-	print("================Results for LibLinear SVC========")
-	print("Training time: %fs; Prediction time: %fs" % (time_liblinear_train, time_liblinear_predict))
-	print(classification_report(test_labels, prediction_liblinear))
-	print("Accuracy:", accuracy_score(test_labels,prediction_liblinear))
-	print("\n")
-
-
 def saveClassifier(classifier):
 	filename = 'Classifiers/classifier.pkl'
 	_ = joblib.dump(classifier, filename, compress=9)
@@ -185,8 +156,8 @@ if __name__ == "__main__":
 	#load model
 	if(WORD2VEC):
 		print("Loading Model..may take some time..please wait!")
-		#model = gensim.models.Word2Vec.load('Models/model_music_L')
-		model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
+		model = gensim.models.Word2Vec.load('Models/model'+str(size))
+		#model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
 	print("Building feature sets...")
 	
 	train_data =[]
@@ -215,8 +186,18 @@ if __name__ == "__main__":
 			comment = rowEdited if rowEdited != "" else row[0]
 			sentiment = row[1]
 			comment = comment.lower()
-			words = word_tokenize(comment)   
+			words = word_tokenize(comment)
 			words = [w for w in words if not w in stopwords.words("english")]
+			#print(words)
+			if(POSFilters):
+				tags = nltk.pos_tag(words)
+				filteredWords = []
+				for tag in tags:
+					if(tag[1] in POSFilter):
+						filteredWords.append(tag[0])
+				print(filteredWords)
+				words = filteredWords
+			
 
 			#Creating features
 			feature = {}	#feature dictionary for filtering later
@@ -231,7 +212,7 @@ if __name__ == "__main__":
 			ListOfFeatures.append(feature)
 
 	totalrows = len(ListOfFeatures)
-	partition = (totalrows*2) / 3
+	partition = (totalrows*8) / 10
 	print("total dataset size:" + str(totalrows))
 	print("training size:" + str(partition))
 
@@ -250,11 +231,17 @@ if __name__ == "__main__":
 		test_data=[]
 		train_vectors = []
 		test_vectors = []
+		positiveCount=0
+		negativeCount=0
 
 		#Constructing actual input for classifier
 		for index,feature in enumerate(ListOfFeatures):
 			if(WORD2VEC):vector = feature['word2vec']
 			sentiment = feature['sentiment']
+			if(sentiment=='positive'):
+				positiveCount+=1
+			elif(sentiment=='negative'):
+				negativeCount+=1
 			comment = feature['comment'] #raw text for TF-IDF vectorization
 			if(index>(partition)):
 				test_data.append(comment)
@@ -279,23 +266,23 @@ if __name__ == "__main__":
 			print("----------TF-IDF + Word2Vec---------")
 			temp_train_vectors = TFIDFvectorizer.fit_transform(train_data)
 			temp_test_vectors = TFIDFvectorizer.transform(test_data)
-			print(temp_train_vectors.shape)
-			print(train_vectors[0].shape)
+			#print(temp_train_vectors.shape)
+			#print(train_vectors[0].shape)
 			combined_train_vector = []
 			combined_test_vector = []
 			for index,vector in enumerate(train_vectors):
 				#print(temp_train_vectors[index,:].shape)
 				#print(vector.shape)
 				temp = sparse.hstack((vector,temp_train_vectors[index,:]))
-				print("tempshape:" + str(temp.shape))
+				#print("tempshape:" + str(temp.shape))
 				temp = temp.toarray()[0]
-				print(temp.shape)
+				#print(temp.shape)
 				combined_train_vector.append(temp)
 			for index,vector in enumerate(test_vectors):
 				temp = sparse.hstack((vector,temp_test_vectors[index,:]))
 				#print(temp)
 				temp = temp.toarray()[0]
-				print(temp.shape)
+				#print(temp.shape)
 				combined_test_vector.append(temp)
 			train_vectors = combined_train_vector
 			test_vectors = combined_test_vector
@@ -331,12 +318,17 @@ if(WORD2VEC):
 	print("==================Word2Vec Model Evaluation===========")
 	print("Average Key Error Rate:" + str(key_error_rate/vectorCount) + "%")
 	print("Entire Document Fail Rate:" + str((entireTextFailed*100)/vectorCount) + "%")
+
+print("================Dataset Statistics====================")
+print("Positive Count:" + str(positiveCount))
+print("Negative Count:" + str(negativeCount))
 	
 print("================Printing Average Results=============")
 if(TFIDF):print("TDIF average score:" + str(TFIDF_MAX / iteration))
 if(BOW):print("Bag of words avg score:" + str(BOW_MAX / iteration))
 if(WORD2VEC):print("Word2Vec Avg score:" + str(WORD2VEC_MAX/iteration))
 if(COMBINE):print("COMBINE Avg score:" + str(COMBINE_MAX/iteration))
+
 
 
 	#runRbfSVM()

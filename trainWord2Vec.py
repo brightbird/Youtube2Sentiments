@@ -24,7 +24,7 @@ from corpusBuilder import Parser
 #logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
-size=24
+size=100
 
 #main script execution
 if __name__ == "__main__":
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 	Parser = Parser()
 	corpus = Parser.buildSentences(False,False)
 	#Train model
-	model = gensim.models.Word2Vec(corpus, min_count=4,workers=4,size=size)
+	model = gensim.models.Word2Vec(corpus, min_count=3,workers=4,size=size,window=10)
 	print("Completed training model")
 	#Saving model
 	#model.save('Models/model'+'_'+identifier+'_L')
