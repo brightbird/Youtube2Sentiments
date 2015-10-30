@@ -34,7 +34,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import *
 from sklearn.externals import joblib
 
-patternForSymbol = re.compile(r'(\ufeff)', re.U) #Regex Emoticon Cleaner
+patternForSymbol = re.compile(r'(\ufe  ff)', re.U) #Regex Emoticon Cleaner
 filename = "Classifiers/classifier.pkl"
 classifier = joblib.load(filename)
 vectorizer = joblib.load('Classifiers/vectorizer.pkl')
