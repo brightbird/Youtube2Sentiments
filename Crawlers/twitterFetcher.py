@@ -1,3 +1,11 @@
+__author__="ytay2,espen"
+
+'''
+Twitter Crawler
+Using Live Streaming API
+Please call this script from root directory
+'''
+
 import codecs
 import sys
 from tweepy import Stream
@@ -6,6 +14,7 @@ from tweepy.streaming import StreamListener
 import time
 import json
 import keys
+import os.path
 
 
 #consumer key, consumer secret, access token, access secret.
@@ -28,7 +37,7 @@ class listener(StreamListener):
         #usernameString = tweet.decode("utf-8")
         try:
             print((username,tweet))
-            output = open("twitter-out.txt", "a")
+            output = open("Raw/twitter-out.txt", "a")
             output.write(tweet)
             output.write('\n')
             output.close()
@@ -46,4 +55,4 @@ auth = OAuthHandler(ckey, csecret)
 auth.set_access_token(atoken, asecret)
 
 twitterStream = Stream(auth, listener())
-twitterStream.filter(track=["song",'music','piano','violin','sonata','guitar','cover','vocal'], languages=['en'])
+twitterStream.filter(track=["music",'chopin','beethoven','sonata','haydn','bach','mozart','classical','pianist','kyle landry'], languages=['en'])

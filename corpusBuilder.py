@@ -48,7 +48,8 @@ class Parser():
 	#From Raw Dir to Corpus directory (aggregated file)
 	def buildCorpus(self):
 		print("Cleaning and building Corpus file....")
-		corpus = open('Corpus/corpus.txt', 'w')
+		cfile = open('Corpus/corpus.txt', 'w')
+		corpus = [] #corpus
 
 		#regex checkers
 		removeLinks = re.compile(r'https?[^\s]*')
@@ -63,49 +64,57 @@ class Parser():
 		rejectedDocs = 0 
 		numericalSpam = 0
 		duplicates = 0
+		linesProcessed = 0 
 		lastWritten = ''
 
 		#actual action
 		for file in os.listdir("Raw"):
 			if file.endswith(".txt"):
 				with open('Raw/'+file) as f:
+					print("Opening file:" + str(file)+'.txt')
 					lines = f.readlines()
 					print("Opening document of size:" + str(len(lines)))
 					for line in lines:
+						linesProcessed+=1
 						line = line.decode('utf-8')
 						line = line.lower() #converts all to lowercase
 						line = re.sub(patternForSymbol, '', line) #emoji seperate
 						if(line==lastWritten):
-							print("Removing duplicated spam")
+							#print("Removing duplicated spam")
 							duplicates+=1
 							continue
 						if re.findall(removeRetweets, line):
-							print("Removing retweet!")
+							#print("Removing retweet!")
 							retweetsRemoved+=1
 							continue
 						if re.findall(removeLinks, line):
-							print("Removing link!")
+							#print("Removing link!")
 							linksRemoved+=1
 							continue
 						numbers = sum(c.isdigit() for c in line)
 						words   = sum(c.isalpha() for c in line)
 						#spaces  = sum(c.isspace() for c in line)
 						if(numbers>words or (numbers>(0.2*len(line)))):
-							print('Rejecting numerical spam')
+							#print('Rejecting numerical spam')
 							numericalSpam+=1
 							continue
 						words = word_tokenize(line)
 						totalTokenCount+=len(words)
-						if (len(words)<10 or len(line)<100):
-							print("Rejecting short content")
+						if (len(words)<8 or len(line)<20):
+							#print("Rejecting short content")
 							rejectedDocs+=1
 							continue
-						corpus.write(line)
+						#corpus.write(line)
+						corpus.append(line)
 						lastWritten = line
 						corpusSize+=1
+		corpus = list(set(corpus)) #remove duplicates
+		for line in corpus:
+			cfile.write(line)
 		print("Finished processing")
 		print("--------------------Preprocessing Statistics-------------------")
-		print("Total lines written:"+str(corpusSize))
+		print("Total lines processed:"+str(linesProcessed))
+		print("Total lines passed:"+str(corpusSize))
 		print("Total Token Count:" + str(totalTokenCount))
 		print('Average token count:'+str(totalTokenCount/corpusSize))
 		print("Rejected Short Length Docs:" + str(rejectedDocs))
@@ -113,6 +122,7 @@ class Parser():
 		print("Removed Links:" + str(linksRemoved))
 		print("Removed Numerical Spam:" + str(numericalSpam))
 		print("Removed Duplicates:" + str(duplicates))
+		cfile.close()
 
 
 
