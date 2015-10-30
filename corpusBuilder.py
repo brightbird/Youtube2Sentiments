@@ -10,7 +10,7 @@ Renamed to corpusBuilder.py to not confuse gensim (it has it's own parser import
 '''
 
 #utility class to parse text and csv files
-from nltk import word_tokenize
+from nltk import word_tokenize, sent_tokenize
 import nltk
 import csv
 import re
@@ -60,14 +60,20 @@ class Parser():
 		linksRemoved = 0
 		retweetsRemoved = 0 
 		totalTokenCount = 0 
-		corpusSize = 0
+		finalLineSize = 0
 		rejectedDocs = 0 
 		numericalSpam = 0
 		duplicates = 0
 		linesProcessed = 0 
 		lastWritten = ''
+		totalSentences = 0
 
-		#actual action
+		#actual action 
+		#modified to take in consideration sentences
+		#lines appended are still documents NOT sentences
+		#sentences extracted just for statistics
+		#Since Word2Vec does not overlap between sentences
+		#Sentences are treated as documents in word2vec
 		for file in os.listdir("Raw"):
 			if file.endswith(".txt"):
 				with open('Raw/'+file) as f:
@@ -79,10 +85,6 @@ class Parser():
 						line = line.decode('utf-8')
 						line = line.lower() #converts all to lowercase
 						line = re.sub(patternForSymbol, '', line) #emoji seperate
-						if(line==lastWritten):
-							#print("Removing duplicated spam")
-							duplicates+=1
-							continue
 						if re.findall(removeRetweets, line):
 							#print("Removing retweet!")
 							retweetsRemoved+=1
@@ -98,25 +100,30 @@ class Parser():
 							#print('Rejecting numerical spam')
 							numericalSpam+=1
 							continue
-						words = word_tokenize(line)
-						totalTokenCount+=len(words)
-						if (len(words)<8 or len(line)<20):
-							#print("Rejecting short content")
-							rejectedDocs+=1
-							continue
-						#corpus.write(line)
+						sent_tokenize_list = sent_tokenize(line)
+						totalSentences += len(sent_tokenize_list)
+						for sent in sent_tokenize_list:
+							words = word_tokenize(sent)
+							totalTokenCount+=len(words)
+							if (len(words)<8 or len(sent)<20):
+								#print("Rejecting short content")
+								rejectedDocs+=1
+								continue
 						corpus.append(line)
-						lastWritten = line
-						corpusSize+=1
+						finalLineSize+=1
+		old_length = len(corpus)
 		corpus = list(set(corpus)) #remove duplicates
+		duplicates = old_length - len(corpus) #get difference 
 		for line in corpus:
 			cfile.write(line)
+
 		print("Finished processing")
 		print("--------------------Preprocessing Statistics-------------------")
 		print("Total lines processed:"+str(linesProcessed))
-		print("Total lines passed:"+str(corpusSize))
+		print("Total lines passed:"+str(finalLineSize)) #Lines passed
+		print("Total Sentence Count:" + str(totalSentences))
 		print("Total Token Count:" + str(totalTokenCount))
-		print('Average token count:'+str(totalTokenCount/corpusSize))
+		print('Average token count:'+str(totalTokenCount/finalLineSize))
 		print("Rejected Short Length Docs:" + str(rejectedDocs))
 		print("Removed Retweets:" + str(retweetsRemoved))
 		print("Removed Links:" + str(linksRemoved))

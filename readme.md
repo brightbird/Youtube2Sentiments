@@ -7,6 +7,12 @@ Yes all the corpus, dataset folders are gitignored.
 
 ## Current development
 
+### Version 0.0.3 Updates
+1. Added Flask Server to serve API
+2. Word2Vec Similarity-vector Algorithm (by Espen)
+3. Relevancy vs Irrelevant classifier
+4. CorpusBuilder upgraded
+
 #### Classifier Scripts
 Note: Performance measured on self-obtained and annotated Youtube comment dataset.
 
@@ -38,4 +44,4 @@ Note: Performance measured on self-obtained and annotated Youtube comment datase
 
 
 ## Version
-0.0.2
+0.0.3
