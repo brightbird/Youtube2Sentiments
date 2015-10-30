@@ -1,6 +1,9 @@
 corpus/*
+Corpus/*
 reference.py
 models/*
 data/*
+Dataset/*
 *.pyc
+.idea
 

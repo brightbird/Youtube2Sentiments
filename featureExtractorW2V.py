@@ -7,6 +7,7 @@ def getFeatures(comments, model, similarityWords = standardSimWords):
     #similarityWords = model.vocab.keys()[1:400]
     for i, comment in enumerate(comments):
         stringComment = comment.encode('ascii', 'ignore')
+        #stringComment = comment.decode('utf-8')
         words = word_tokenize(stringComment)
         #words = word_tokenize(comment)
         for j, similarityWord in enumerate(similarityWords):

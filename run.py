@@ -59,11 +59,12 @@ stemmer = PorterStemmer()
 
 #POS tags Filters
 POSFilter = ["JJ", "JJS", "JJR",'NN','NNS','NNP']
-POSFilters = True
+POSFilters = False
 
 
 #Loop & Testing Controls
 iteration = 10
+equalTokens = False
 
 #Word2Vec settings
 size = 28 #feature size for word2vec model
@@ -73,17 +74,17 @@ entireTextFailed = 0
 
 #Bag of words count vectorizer
 BOWvectorizer = CountVectorizer(analyzer = "word",   \
-                             tokenizer = None,    \
-                             preprocessor = None, \
-                             stop_words = None,   \
-                             ngram_range=(1,5), \
-                             max_features = 300) 
+							 tokenizer = None,    \
+							 preprocessor = None, \
+							 stop_words = None,   \
+							 ngram_range=(1,5), \
+							 max_features = 300) 
 
 # Making tf-idf vectors
 TFIDFvectorizer = TfidfVectorizer(min_df=5,
-                                  max_df=0.8,
-                                  sublinear_tf=True,
-                                  use_idf=True)
+								  max_df=0.8,
+								  sublinear_tf=True,
+								  use_idf=True)
 
 "Build word vector averages from Word2vec"
 
@@ -123,104 +124,69 @@ def buildWordVector(model, text, size):
 	return vec[0]
 
 def runLinearSVM():
-    global SAVED
-    global saveVectorizer
-    # Perform classification with SVM, kernel=linear
-    print("================Results for SVC(kernel=linear)========")
-    classifier_linear = svm.SVC(kernel='linear')
-    t0 = time.time()
-    classifier_linear.fit(train_vectors, train_labels)
-    t1 = time.time()
-    prediction_linear = classifier_linear.predict(test_vectors)
-    t2 = time.time()
-    time_linear_train = t1 - t0
-    time_linear_predict = t2 - t1
-    print("Training time: %fs; Prediction time: %fs" % (time_linear_train, time_linear_predict))
-    print(classification_report(test_labels, prediction_linear))
-    score = accuracy_score(test_labels, prediction_linear)
-    print(score)
-    # print("Accuracy:", accuracy_score(test_labels,prediction_linear))
-    print("\n")
-    if (score >= 0.85 and SAVED == False):
-        # Save Classifier for future use
-        print("Saving classifier of score:" + str(score))
-        saveClassifier(classifier_linear)
-        SAVED = True  # switch, do not want to save multiple classifiers
-        saveVectorizer = True  # switch, yes we want to persist vectorizer
-    return score
-
-
-def runRbfSVM():
-    # Perform classification with SVM, kernel=rbf
-    classifier_rbf = svm.SVC()
-    t0 = time.time()
-    classifier_rbf.fit(train_vectors, train_labels)
-    t1 = time.time()
-    prediction_rbf = classifier_rbf.predict(test_vectors)
-    t2 = time.time()
-    time_rbf_train = t1 - t0
-    time_rbf_predict = t2 - t1
-    # Print results in a nice table
-    print("================Results for SVC(kernel)-RBF========")
-    print("Training time: %fs; Prediction time: %fs" % (time_rbf_train, time_rbf_predict))
-    print(classification_report(test_labels, prediction_rbf))
-    print("Accuracy:", accuracy_score(test_labels, prediction_rbf))
-    print("\n")
-
-
-def runLibLinearSVM():
-    # Perform classification with SVM, kernel=linear
-    classifier_liblinear = svm.LinearSVC()
-    t0 = time.time()
-    classifier_liblinear.fit(train_vectors, train_labels)
-    t1 = time.time()
-    prediction_liblinear = classifier_liblinear.predict(test_vectors)
-    t2 = time.time()
-    time_liblinear_train = t1 - t0
-    time_liblinear_predict = t2 - t1
-    print("================Results for LibLinear SVC========")
-    print("Training time: %fs; Prediction time: %fs" % (time_liblinear_train, time_liblinear_predict))
-    print(classification_report(test_labels, prediction_liblinear))
-    print("Accuracy:", accuracy_score(test_labels, prediction_liblinear))
-    print("\n")
+	global SAVED
+	global saveVectorizer
+	# Perform classification with SVM, kernel=linear
+	print("================Results for SVC(kernel=linear)========")
+	classifier_linear = svm.SVC(kernel='linear')
+	t0 = time.time()
+	classifier_linear.fit(train_vectors, train_labels)
+	t1 = time.time()
+	prediction_linear = classifier_linear.predict(test_vectors)
+	t2 = time.time()
+	time_linear_train = t1 - t0
+	time_linear_predict = t2 - t1
+	print("Training time: %fs; Prediction time: %fs" % (time_linear_train, time_linear_predict))
+	print(classification_report(test_labels, prediction_linear))
+	score = accuracy_score(test_labels, prediction_linear)
+	print(score)
+	# print("Accuracy:", accuracy_score(test_labels,prediction_linear))
+	print("\n")
+	if (score >= 0.85 and SAVED == False):
+		# Save Classifier for future use
+		print("Saving classifier of score:" + str(score))
+		saveClassifier(classifier_linear)
+		SAVED = True  # switch, do not want to save multiple classifiers
+		saveVectorizer = True  # switch, yes we want to persist vectorizer
+	return score
 
 
 def saveClassifier(classifier):
-    filename = 'Classifiers/classifier.pkl'
-    _ = joblib.dump(classifier, filename, compress=9)
-    print("Classifier persisted!")
+	filename = 'Classifiers/classifier.pkl'
+	_ = joblib.dump(classifier, filename, compress=9)
+	print("Classifier persisted!")
 
 
 def createClassifierInput(dataSets, validationSet = 0):
-    global index, feature, vector, sentiment, comment, positiveCount, negativeCount
-    training1 = dataSets[(validationSet + 1) % 3]
-    training2 = dataSets[(validationSet + 2) % 3]
-    partition = len(training1) + len(training2) -1
-    ListOfFeatures = training1 + training2 + dataSets[validationSet]
-    for index, feature in enumerate(ListOfFeatures):
-        if (WORD2VEC): vector = feature['word2vec']
-        sentiment = feature['sentiment']
-        if(sentiment=='positive'):
+	global index, feature, vector, sentiment, comment, positiveCount, negativeCount
+	training1 = dataSets[(validationSet + 1) % 3]
+	training2 = dataSets[(validationSet + 2) % 3]
+	partition = len(training1) + len(training2) -1
+	ListOfFeatures = training1 + training2 + dataSets[validationSet]
+	for index, feature in enumerate(ListOfFeatures):
+		if (WORD2VEC): vector = feature['word2vec']
+		sentiment = feature['sentiment']
+		if(sentiment=='positive'):
 				positiveCount+=1
-			elif(sentiment=='negative'):
+		elif(sentiment=='negative'):
 				negativeCount+=1
-        comment = feature['comment']  # raw text for TF-IDF vectorization
-        if (index > (partition)):
-            test_data.append(comment)
-            if (WORD2VEC):
-                test_vectors.append(vector)
-            test_labels.append(sentiment)
-            continue
-        else:
-            train_data.append(comment)
-            if (WORD2VEC):
-                train_vectors.append(vector)
-            train_labels.append(sentiment)
+		comment = feature['comment']  # raw text for TF-IDF vectorization
+		if (index > (partition)):
+			test_data.append(comment)
+			if (WORD2VEC):
+				test_vectors.append(vector)
+			test_labels.append(sentiment)
+			continue
+		else:
+			train_data.append(comment)
+			if (WORD2VEC):
+				train_vectors.append(vector)
+			train_labels.append(sentiment)
 
 
 # main script execution
 if __name__ == "__main__":
-    #load model
+	#load model
 	if(WORD2VEC):
 		print("Loading Model..may take some time..please wait!")
 		model = gensim.models.Word2Vec.load('Models/model'+str(size))
@@ -275,26 +241,26 @@ if __name__ == "__main__":
 				feature['word2vec'] = vector
 
 			feature['comment'] = comment	#save raw text for future processing
- 			feature['sentiment'] = sentiment
+			feature['sentiment'] = sentiment
 			ListOfFeatures.append(feature)
 
 	totalrows = len(ListOfFeatures)
 	partition = (totalrows*8) / 10
-	print("total dataset size:" + str(totalrows))
-	print("training size:" + str(partition))
+
 
 	#Max scores for average results
 	TFIDF_MAX = 0
 	BOW_MAX = 0
 	WORD2VEC_MAX = 0
 	COMBINE_MAX = 0
-    W2W_SIM_SENTIMENT_MAX = 0
+	W2W_SIM_SENTIMENT_MAX = 0
 
-
-    #random.shuffle(ListOfFeatures)
-    dataSets = equalDataSetSplitter.splitIntoThreeEqualTokenSet(ListOfFeatures)
-    for set in dataSets:
-        equalDataSetSplitter.tokenChecker(set)
+	dataSets = []
+	#random.shuffle(ListOfFeatures)
+	if(equalTokens):
+		dataSets = equalDataSetSplitter.splitIntoThreeEqualTokenSet(ListOfFeatures)
+	for set in dataSets:
+		equalDataSetSplitter.tokenChecker(set)
 	#Main loop
 	for i in range(0,iteration):
 		random.shuffle(ListOfFeatures)
@@ -307,10 +273,32 @@ if __name__ == "__main__":
 		positiveCount=0
 		negativeCount=0
 
-
-        # Constructing actual input for classifier
-        createClassifierInput(dataSets, i%3)
-
+		"Note:Please use a switch to control new functionality, so I do not lose old functionality"
+		if(equalTokens):
+			# Constructing actual input for classifier
+			# Based on number of tokens
+			createClassifierInput(dataSets, i%3)
+		else:
+			#Constructing actual input for classifier
+			for index,feature in enumerate(ListOfFeatures):
+				if(WORD2VEC):vector = feature['word2vec']
+				sentiment = feature['sentiment']
+				if(sentiment=='positive'):
+					positiveCount+=1
+				elif(sentiment=='negative'):
+					negativeCount+=1
+				comment = feature['comment'] #raw text for TF-IDF vectorization
+				if(index>(partition)):
+					test_data.append(comment)
+					if(WORD2VEC):
+						test_vectors.append(vector)
+					test_labels.append(sentiment)
+					continue
+				else:
+					train_data.append(comment)
+					if(WORD2VEC):
+						train_vectors.append(vector)
+					train_labels.append(sentiment)
 
 		#Runs word2 vec first because we do not want to corrupt the word2vec vector variable
 		if(WORD2VEC):
@@ -367,16 +355,16 @@ if __name__ == "__main__":
 				joblib.dump(BOWvectorizer, 'Classifiers/vectorizer.pkl', compress=9)
 				saveVectorizer = False
 
-        if (W2W_SIM_SENTIMENT):
-            print("----------- Word2Vec similarity--------------")
-            train_vectors = featureExtractorW2V.getFeatures(train_data, model)
-            test_vectors = featureExtractorW2V.getFeatures(test_data, model)
-            featureExtractorW2V.testContext(train_data, model)
-            score = runLinearSVM()
-            W2W_SIM_SENTIMENT_MAX += score
-            print("Score: ", score)
-            # print("Persisting SVM...")
-            # joblib.dump(classifier_linear, 'svm_linear.pkl')
+		if (W2W_SIM_SENTIMENT):
+			print("----------- Word2Vec similarity--------------")
+			train_vectors = featureExtractorW2V.getFeatures(train_data, model)
+			test_vectors = featureExtractorW2V.getFeatures(test_data, model)
+			featureExtractorW2V.testContext(train_data, model)
+			score = runLinearSVM()
+			W2W_SIM_SENTIMENT_MAX += score
+			print("Score: ", score)
+			# print("Persisting SVM...")
+			# joblib.dump(classifier_linear, 'svm_linear.pkl')
 
 		#print("Persisting SVM...")
 		#joblib.dump(classifier_linear, 'svm_linear.pkl')
@@ -389,6 +377,8 @@ if(WORD2VEC):
 print("================Dataset Statistics====================")
 print("Positive Count:" + str(positiveCount))
 print("Negative Count:" + str(negativeCount))
+#print("total dataset size:" + str(totalrows))
+#print("training size:" + str(partition))
 
 print("================Printing Average Results=============")
 if (TFIDF): print("TDIF average score:" + str(TFIDF_MAX / iteration))

@@ -36,7 +36,7 @@ if __name__ == "__main__":
 	test_data=[]
 
 	#reads in CSV file
-	with open('data/dataset.csv','r') as dataFile:
+	with open('Dataset/dataset.csv','r') as dataFile:
 		reader = csv.reader(dataFile, delimiter=',')
 		for index,row in enumerate(reader):
 			row[0] = row[0].decode('utf-8')
