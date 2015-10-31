@@ -229,6 +229,14 @@ if __name__ == "__main__":
 
 
 	dataSets = []
+
+	#Just some vars for feature size tracking
+	combine_size = 0 
+	sim_size = 0 
+	TFIDF_size = 0
+	BOW_size = 0 
+	W2V_size = 0 
+
 	#random.shuffle(ListOfFeatures)
 	if(equalTokens):
 		dataSets = equalDataSetSplitter.splitIntoThreeEqualTokenSet(ListOfFeatures)
@@ -243,6 +251,7 @@ if __name__ == "__main__":
 		test_data=[]
 		train_vectors = []
 		test_vectors = []
+
 
 
 		"Note:Please use a switch to control new functionality, so I do not lose old functionality"
@@ -301,6 +310,7 @@ if __name__ == "__main__":
 			train_vectors = combined_train_vector
 			test_vectors = combined_test_vector
 			#print(train_vectors[0].shape)
+			combine_size = train_vectors[0].shape
 			score = runLinearSVM("COMBINE")
 			COMBINE_MAX+=score
 
@@ -308,6 +318,7 @@ if __name__ == "__main__":
 			print("----------Tf-idf Approach------------")
 			train_vectors = TFIDFvectorizer.fit_transform(train_data)
 			test_vectors = TFIDFvectorizer.transform(test_data)
+			TFIDF_size =len(TFIDFvectorizer.get_feature_names())
 			score = runLinearSVM("TFIDF")
 			TFIDF_MAX+=score
 			if(saveVectorizer):
@@ -324,6 +335,7 @@ if __name__ == "__main__":
 			train_vectors = BOWvectorizer.fit_transform(train_data)
 			#vocab = BOWvectorizer.get_feature_names()
 			#print(vocab)
+			BOW_size = len(BOWvectorizer.get_feature_names())
 			test_vectors = BOWvectorizer.transform(test_data)
 			score = runLinearSVM("BOW")
 			BOW_MAX+=score
@@ -341,6 +353,7 @@ if __name__ == "__main__":
 			train_vectors = featureExtractorW2V.getFeatures(train_data, model)
 			test_vectors = featureExtractorW2V.getFeatures(test_data, model)
 			featureExtractorW2V.testContext(train_data, model)
+			sim_size = len(train_vectors)
 			score = runLinearSVM("W2VSIM")
 			W2W_SIM_SENTIMENT_MAX += score
 			print("Score: ", score)
@@ -363,8 +376,19 @@ if(RELEVANCY):
 elif(POSNEG):
 	print("Positive Count:" + str(positiveCount))
 	print("Negative Count:" + str(negativeCount))
+	print("Irrelevant Count:" + str(irrelevantCount))
+	print("Neutral Count:" + str(neutralCount))
+	print("Mixed Count:" + str(mixedCount))
 #print("total dataset size:" + str(totalrows))
 #print("training size:" + str(partition))
+
+print("================Feature Statistics====================")
+print("Bag of words Feature Size:" + str(BOW_size))
+print("TFIDF Feature Size:" + str(TFIDF_size))
+print("Word2Vec dimensions:" + str(size))
+print("Combine feature size:" + str(combine_size))
+print("W2V SimAlgo Feature Size:" + str(sim_size))
+
 
 print("================Printing Average Results=============")
 if (TFIDF): print("TDIF average score:" + str(TFIDF_MAX / iteration))

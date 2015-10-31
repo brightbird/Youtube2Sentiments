@@ -31,7 +31,7 @@ if __name__ == "__main__":
 		
 	print("Loading models..might take awhile")
 	#load models
-	model = gensim.models.Word2Vec.load('Models/model28')
+	model = gensim.models.Word2Vec.load('Models/model100')
 	#model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
 	print("Model loaded")
 	tests = []

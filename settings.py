@@ -37,11 +37,11 @@ LEMMATIZE = False
 STEMMING = False
 
 #Feature Selection Switches
-TFIDF = False
-WORD2VEC = False
+TFIDF = True
+WORD2VEC = True
 BOW = True
-COMBINE = False 		#TF-IDF + Word2VecAverage Combine Vectors
-W2W_SIM_SENTIMENT = False	#Word2Vec Similairty Algorithm 
+COMBINE = True 		#TF-IDF + Word2VecAverage Combine Vectors
+W2W_SIM_SENTIMENT = True	#Word2Vec Similairty Algorithm 
 
 
 '''
@@ -55,23 +55,24 @@ BOWvectorizer = CountVectorizer(analyzer = "word",   \
 							 preprocessor = None, \
 							 stop_words = None,   \
 							 ngram_range=(1,5), \
-							 max_features = 300) 
+							 max_features = 5000) 
 
 # Making tf-idf vectors
 TFIDFvectorizer = TfidfVectorizer(min_df=5,
 								  max_df=0.8,
+								  ngram_range=(1,5),
 								  sublinear_tf=True,
 								  use_idf=True)
 
 #Persistence Switches
-SAVED = False #True = Do not save (already saved, in other words)
+SAVED = True #True = Do not save (already saved, in other words)
 saveVectorizer = False 	#Whether we want to save the vectorizer
 SAVE_THRESHOLD = 0.85
 
 
 #Modes 
-POSNEG = False #Only evaluate Positive and Negative Polarity
-RELEVANCY = True #Train for relevancy -> build relevancy classifier 
+POSNEG = True #Only evaluate Positive and Negative Polarity
+RELEVANCY = False #Train for relevancy -> build relevancy classifier 
 
 #Pre-processing Variables
 patternForSymbol = re.compile(r'(\ufeff)', re.U)  # Regex Emoticon Cleaner
@@ -85,12 +86,12 @@ POSFilters = False
 
 
 #Loop & Testing Controls
-iteration = 1
+iteration = 10
 equalTokens = False		#whether to use equal tokens partitioning 
-TRAINING_PERCENTAGE = 0.8		#training and testing set ratio
+TRAINING_PERCENTAGE = 0.9		#training and testing set ratio
 
 #Word2Vec settings
-size = 28 #feature size for word2vec model
+size = 100 #feature size for word2vec model
 key_error_rate = 0 #Number of key lookup errors
 vectorCount = 0 	#For averaging word vectors (calculate percentage lost)
 entireTextFailed = 0 	#Count for number of total failed docs
