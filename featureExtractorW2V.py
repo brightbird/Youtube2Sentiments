@@ -1,15 +1,28 @@
 from nltk import word_tokenize
 
-standardSimWords = ["happy", "positive", "negative", "cool", "nice", "love", "hat", "not", "poor", "good", "ugly", "handsome", "fail"]
+standardSimWords = [u"happy", u"positive", u"negative", u"cool", u"nice", u"love", u"hat", u"not", u"poor", u"good", u"ugly", u"handsome", u"fail", u'gay',u'sucked', u'glad',u'bastard',u'fat', u'inspire', u'quality']
+wordsSet = False
 
-def getFeatures(comments, model, similarityWords = standardSimWords):
+def setSimilarityWords(model, words=None):
+    if wordsSet: return
+    extraWords = 60
+    for word in standardSimWords:
+        extraWords -= 1
+        if extraWords < 1: break
+        try:
+            similars = model.most_similar(positive=[word],topn=8)
+            for word, sim in similars:
+                standardSimWords.append(word)
+        except KeyError:
+            pass
+def getFeatures(comments, model, similarityWords = list(standardSimWords)):
     features = [[] for x in range(len(comments))]
     #similarityWords = model.vocab.keys()[1:400]
     for i, comment in enumerate(comments):
         stringComment = comment.encode('ascii', 'ignore')
         #stringComment = comment.decode('utf-8')
-        words = word_tokenize(stringComment)
-        #words = word_tokenize(comment)
+        #words = word_tokenize(stringComment)
+        words = word_tokenize(comment)
         for j, similarityWord in enumerate(similarityWords):
             cumulativeSimilarity = 0
             for word in words:
@@ -25,6 +38,7 @@ def getFeatures(comments, model, similarityWords = standardSimWords):
 videoSimilarityWords = ["video", "artist", "song", "other"]
 
 def testContext(comments, model): #TODO: Test, next time: I think a minimum value before labeling is smart. Also note that the words should be utf8.. not ascii
+    return 0
     simScores = getFeatures(comments, model, videoSimilarityWords)
     labels = []
     for score in simScores:
