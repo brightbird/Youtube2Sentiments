@@ -37,11 +37,11 @@ LEMMATIZE = False
 STEMMING = False
 
 #Feature Selection Switches
-TFIDF = True
-WORD2VEC = True
-BOW = True
-COMBINE = True 		#TF-IDF + Word2VecAverage Combine Vectors
-W2W_SIM_SENTIMENT = True	#Word2Vec Similairty Algorithm 
+TFIDF = False
+WORD2VEC = False
+BOW = False
+COMBINE = False 		#TF-IDF + Word2VecAverage Combine Vectors
+W2W_SIM_SENTIMENT = True	#Word2Vec Similairty Algorithm
 
 
 '''
@@ -86,8 +86,10 @@ POSFilters = False
 
 
 #Loop & Testing Controls
-iteration = 10
-equalTokens = False		#whether to use equal tokens partitioning 
+iteration = 3
+equalTokens = False		#whether to use equal tokens partitioning
+selectNumberOfComments = 300
+errorCommentPrinter = False
 TRAINING_PERCENTAGE = 0.9		#training and testing set ratio
 
 #Word2Vec settings
