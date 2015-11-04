@@ -359,14 +359,13 @@ if __name__ == "__main__":
 
         if (W2W_SIM_SENTIMENT):
             print("----------- Word2Vec similarity--------------")
-            # featureExtractorW2V.setSimilarityWords(model, words=featureExtractorW2V.vocabulary)
-            # train_vectors = featureExtractorW2V.getFeatures(train_data, model)
-            # test_vectors = featureExtractorW2V.getFeatures(test_data, model)
-            contextExtractor.testContext(train_data, model)
-           #  sim_size = len(train_vectors[0])
-           # # score = runLinearSVM("W2VSIM")
-           #  W2W_SIM_SENTIMENT_MAX += score
-           #  print("Score: ", score)
+            featureExtractorW2V.setSimilarityWords(model, words=featureExtractorW2V.vocabulary)
+            train_vectors = featureExtractorW2V.getFeatures(train_data, model)
+            test_vectors = featureExtractorW2V.getFeatures(test_data, model)
+            sim_size = len(train_vectors[0])
+            score = runLinearSVM("W2VSIM")
+            W2W_SIM_SENTIMENT_MAX += score
+            print("Score: ", score)
         # print("Persisting SVM...")
         # joblib.dump(classifier_linear, 'svm_linear.pkl')
 
