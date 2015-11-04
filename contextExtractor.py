@@ -100,5 +100,5 @@ if __name__ == "__main__":
             print(comments[i].encode('ascii', 'ignore'))
             print("Label extra sim words:", labelsExtra[i], " confidence: ", confidencesExtra[i])
             print("Label no extra sim words:", labels[i], " confidence: ", confidences[i])
-    ratio = differentLabels / len(comments)
-    print("Different labels (%): ", differentLabels/ len(comments), differentLabels, ratio)
+    differenceRatio = differentLabels / float(len(comments))
+    print("Different labels (%): ", differenceRatio)
