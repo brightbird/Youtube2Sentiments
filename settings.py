@@ -37,10 +37,10 @@ LEMMATIZE = False
 STEMMING = False
 
 #Feature Selection Switches
-TFIDF = True
-WORD2VEC = True
-BOW = True
-COMBINE = True 		#TF-IDF + Word2VecAverage Combine Vectors
+TFIDF = False
+WORD2VEC = False
+BOW = False
+COMBINE = False 		#TF-IDF + Word2VecAverage Combine Vectors
 W2W_SIM_SENTIMENT = True	#Word2Vec Similairty Algorithm
 
 
@@ -98,8 +98,6 @@ key_error_rate = 0 #Number of key lookup errors
 vectorCount = 0 	#For averaging word vectors (calculate percentage lost)
 entireTextFailed = 0 	#Count for number of total failed docs
 
-
-#GLOBAL/RUNTIME variables NOT settings
 train_data =[]
 train_labels=[]
 test_labels=[]
@@ -113,8 +111,6 @@ neutralCount=0
 irrelevantCount=0
 relevantCount=0 #Only for relevant vs irrelevant
 mixedCount=0
-duplicateDataCount = 0 
-linesProcessed = 0
 
 #stores vectors before spliting into training and testing
 ListOfFeatures = []

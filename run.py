@@ -1,3 +1,4 @@
+
 from WrongClassificationPrinter import printWrongClassifiedComments
 
 __author__ = 'ytay2'
@@ -366,10 +367,9 @@ if __name__ == "__main__":
 
         if (W2W_SIM_SENTIMENT):
             print("----------- Word2Vec similarity--------------")
-            featureExtractorW2V.setSimilarityWords(model)
+            featureExtractorW2V.setSimilarityWords(model, words=featureExtractorW2V.vocabulary)
             train_vectors = featureExtractorW2V.getFeatures(train_data, model)
             test_vectors = featureExtractorW2V.getFeatures(test_data, model)
-            featureExtractorW2V.testContext(train_data, model)
             sim_size = len(train_vectors[0])
             score = runLinearSVM("W2VSIM")
             W2W_SIM_SENTIMENT_MAX += score
@@ -398,7 +398,7 @@ elif (POSNEG):
     print("Mixed Count:" + str(mixedCount))
 print("total dataset size:" + str(totalrows))
 print("training size:" + str(partition))
-print("duplication removed size:" + str(duplicateDataCount))
+#print("duplication removed size:" + str(duplicateDataCount))
 print("lines processed:" + str(linesProcessed))
 
 print("================Feature Statistics====================")

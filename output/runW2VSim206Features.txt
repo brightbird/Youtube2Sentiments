@@ -1,0 +1,62 @@
+C:\Python27\python.exe C:/git/Youtube2Sentiments/run.py
+Building feature sets...
+Reading dataset..
+Skipping header for data file
+----------- Word2Vec similarity--------------
+================Results for SVC(kernel=linear)========
+Training time: 0.111000s; Prediction time: 0.011000s
+             precision    recall  f1-score   support
+
+   negative       0.75      0.30      0.43        20
+   positive       0.84      0.97      0.90        74
+
+avg / total       0.82      0.83      0.80        94
+
+0.829787234043
+
+
+('Score: ', 0.82978723404255317)
+----------- Word2Vec similarity--------------
+================Results for SVC(kernel=linear)========
+Training time: 0.115000s; Prediction time: 0.011000s
+             precision    recall  f1-score   support
+
+   negative       0.71      0.19      0.30        26
+   positive       0.76      0.97      0.85        68
+
+avg / total       0.75      0.76      0.70        94
+
+0.755319148936
+
+
+('Score: ', 0.75531914893617025)
+----------- Word2Vec similarity--------------
+================Results for SVC(kernel=linear)========
+Training time: 0.103000s; Prediction time: 0.010000s
+             precision    recall  f1-score   support
+
+   negative       0.75      0.29      0.42        31
+   positive       0.73      0.95      0.83        63
+
+avg / total       0.74      0.73      0.69        94
+
+0.734042553191
+
+
+('Score: ', 0.73404255319148937)
+================Dataset Statistics====================
+Positive Count:689
+Negative Count:254
+Irrelevant Count:0
+Neutral Count:0
+Mixed Count:0
+================Feature Statistics====================
+Bag of words Feature Size:0
+TFIDF Feature Size:0
+Word2Vec dimensions:100
+Combine feature size:0
+W2V SimAlgo Feature Size:206
+================Printing Average Results=============
+Word2Vec SIM-ALGO score:0.77304964539
+
+Process finished with exit code 0
