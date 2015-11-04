@@ -1,5 +1,5 @@
-import contextExtractor
-from wrongClassificationPrinter import printWrongClassifiedComments
+
+from WrongClassificationPrinter import printWrongClassifiedComments
 
 __author__ = 'ytay2'
 
@@ -46,6 +46,7 @@ from nltk.stem.porter import *
 from sklearn.externals import joblib
 from scipy import sparse
 from settings import *
+
 
 "Build word vector averages from Word2vec"
 
@@ -164,21 +165,22 @@ if __name__ == "__main__":
     # load model
     if (WORD2VEC):
         print("Loading Model..may take some time..please wait!")
-        #model = gensim.models.Word2Vec.load('Models/model' + str(size))
-    model = gensim.models.Word2Vec.load('Models/model28')
+        model = gensim.models.Word2Vec.load('Models/model' + str(size))
     #model = Word2Vec.load_word2vec_format('Dataset/GoogleNews-vectors-negative300.bin', binary=True)  # C binary format
     print("Building feature sets...")
 
     print("Reading dataset..")
     # reads in CSV file
     with open('Dataset/dataset.csv', 'rb') as dataFile:
+        linesProcessed = 0
         reader = csv.reader(dataFile, delimiter=',')
         comments = set()
+
         for index, row in enumerate(reader):
             if (index == 0):
                 print("Skipping header for data file")
                 continue
-
+            linesProcessed+=1
             # Pre-processing
             row[0] = row[0].decode('utf-8')
             rowEdited = re.sub(patternForSymbol, '', row[0])
@@ -186,8 +188,13 @@ if __name__ == "__main__":
             sentiment = row[1]
             comment = comment.lower()
             #This is a duplicate comment, we need to skip it...
+            '''
             if comment in comments:
+                duplicateDataCount +=1
+                print(comment)
                 continue
+            '''
+            
             comments.add(comment) #This is not a duplicate comment, continue
             # Switch to check if we want to do Pos/Neg or Relevant/Irrelant
             if (RELEVANCY):
@@ -235,6 +242,7 @@ if __name__ == "__main__":
             feature['sentiment'] = sentiment
             ListOfFeatures.append(feature)
 
+
     totalrows = len(ListOfFeatures)
     partition = (totalrows) * TRAINING_PERCENTAGE
 
@@ -250,8 +258,8 @@ if __name__ == "__main__":
     # random.shuffle(ListOfFeatures)
     if (equalTokens):
         dataSets = equalDataSetSplitter.splitIntoThreeEqualTokenSet(ListOfFeatures, selectNumberOfComments)
-    for set in dataSets:
-        equalDataSetSplitter.tokenChecker(set)
+        for set in dataSets:
+            equalDataSetSplitter.tokenChecker(set)
     # Main loop
     for i in range(0, iteration):
         random.shuffle(ListOfFeatures)
@@ -388,8 +396,10 @@ elif (POSNEG):
     print("Irrelevant Count:" + str(irrelevantCount))
     print("Neutral Count:" + str(neutralCount))
     print("Mixed Count:" + str(mixedCount))
-# print("total dataset size:" + str(totalrows))
-# print("training size:" + str(partition))
+print("total dataset size:" + str(totalrows))
+print("training size:" + str(partition))
+#print("duplication removed size:" + str(duplicateDataCount))
+print("lines processed:" + str(linesProcessed))
 
 print("================Feature Statistics====================")
 print("Bag of words Feature Size:" + str(BOW_size))
