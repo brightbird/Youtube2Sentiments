@@ -65,8 +65,9 @@ class ContextExtractor():
             return editedComment
 
     def giveContext(self, comment):
-        videoScores = featureExtractorW2V.findSimilarity(comment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
-        songScores = featureExtractorW2V.findSimilarity(comment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
+        editedComment = self.preProcessComment(comment)
+        videoScores = featureExtractorW2V.findSimilarity(editedComment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
+        songScores = featureExtractorW2V.findSimilarity(editedComment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
         labels, confidences = self.calculateConfidences([max(videoScores), max(songScores)])
         return labels[0], confidences[0] #E.g. "Video", 0.523511
 
