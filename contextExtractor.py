@@ -67,8 +67,8 @@ class ContextExtractor():
     def giveContext(self, comment):
         editedComment = self.preProcessComment(comment)
         videoScores = featureExtractorW2V.findSimilarity(editedComment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
-        songScores = featureExtractorW2V.findSimilarity(editedComment, self.model, self.videoSimilarityWords, featureExtractorW2V.ownMax)
-        labels, confidences = self.calculateConfidences([max(videoScores), max(songScores)])
+        songScores = featureExtractorW2V.findSimilarity(editedComment, self.model, self.songSimilarityWords, featureExtractorW2V.ownMax)
+        labels, confidences = self.calculateConfidences([max(videoScores)], [max(songScores)])
         return labels[0], confidences[0] #E.g. "Video", 0.523511
 
     def getContexts(self, comments):
@@ -103,3 +103,4 @@ if __name__ == "__main__":
             print("Label no extra sim words:", labels[i], " confidence: ", confidences[i])
     differenceRatio = differentLabels / float(len(comments))
     print("Different labels (%): ", differenceRatio)
+    print(contextExtractor.giveContext(comments[37]))
