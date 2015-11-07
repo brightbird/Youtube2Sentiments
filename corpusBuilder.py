@@ -1,3 +1,4 @@
+from __future__ import division
 #!/usr/bin/python
 __author__ = 'ytay2'
 
@@ -20,6 +21,7 @@ from nltk.stem.porter import *
 from nltk.corpus import stopwords
 # encoding=utf8
 import sys
+
 
 
 '''
@@ -81,6 +83,7 @@ class Parser():
 					lines = f.readlines()
 					print("Opening document of size:" + str(len(lines)))
 					for line in lines:
+						doNotAppend = False 
 						linesProcessed+=1
 						line = line.decode('utf-8')
 						line = line.lower() #converts all to lowercase
@@ -108,7 +111,10 @@ class Parser():
 							if (len(words)<8 or len(sent)<20):
 								#print("Rejecting short content")
 								rejectedDocs+=1
-								continue
+								doNotAppend = True 
+								break
+						if(doNotAppend):
+							continue
 						corpus.append(line)
 						finalLineSize+=1
 		old_length = len(corpus)
@@ -129,6 +135,13 @@ class Parser():
 		print("Removed Links:" + str(linksRemoved))
 		print("Removed Numerical Spam:" + str(numericalSpam))
 		print("Removed Duplicates:" + str(duplicates))
+		print("--------------------Percentages % ------------------------------")
+		print("Rejected Short Length Docs:" + str(rejectedDocs/linesProcessed))
+		print("Removed Retweets:" + str(retweetsRemoved/linesProcessed))
+		print("Removed Links:" + str(linksRemoved/linesProcessed))
+		print("Removed Numerical Spam:" + str(numericalSpam/linesProcessed))
+		print("Removed Duplicates:" + str(duplicates/linesProcessed))
+		print("Total lines passed:"+str(old_length/linesProcessed)) 
 		cfile.close()
 
 

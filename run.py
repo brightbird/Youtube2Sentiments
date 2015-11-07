@@ -1,6 +1,3 @@
-
-from WrongClassificationPrinter import printWrongClassifiedComments
-
 __author__ = 'ytay2'
 
 '''
@@ -9,12 +6,11 @@ Currently supports:
 1) Feature selection (Bag Of words, TFIDF, Word2Vec averaging, Word2Vec similarity scores)
 2) Training and testing classifiers (SVM Linear only)
 3) K-fold validation with support with equal token validation
-4) Switches for Pos Vs NEG or relevant vs Irrelevant
+4) Switches for POS Vs NEG or relevant vs Irrelevant
 5) Switches for Preprocessing (lem or stemming)
 '''
 
 # import libraries, modules
-# unused imports still left because lazy 
 import os
 import nltk
 import csv
@@ -46,6 +42,7 @@ from nltk.stem.porter import *
 from sklearn.externals import joblib
 from scipy import sparse
 from settings import *
+from WrongClassificationPrinter import printWrongClassifiedComments
 
 
 "Build word vector averages from Word2vec"
